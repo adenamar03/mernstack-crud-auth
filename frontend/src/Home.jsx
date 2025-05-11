@@ -1,36 +1,65 @@
-import React from 'react'
-import { useNavigate, useParams } from 'react-router-dom';
-
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 function Home() {
-    const [name, setName] = React.useState("");
-    const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [userData, setUserData] = useState([]);
+  const navigate = useNavigate();
 
-    React.useEffect(() =>{
-        checkData();
-     },[])
+  useEffect(() => {
+    checkData();
+    fetchData(); // ✅ Call API on mount
+  }, []);
 
-     const checkData = () =>{
-        if(localStorage.getItem('is_login'))
-        {
-            var a = localStorage.getItem('username');
-            setName(a);
-        }else{
-            alert('Login is required')
-            navigate('/Login');
-        }
+  const checkData = () => {
+    if (localStorage.getItem('is_login')) {
+      setName(localStorage.getItem('username'));
+    } else {
+      alert('Login is required');
+      navigate('/Login');
     }
+  };
 
-    const logoutData = () =>{
-        
-        localStorage.clear();
-            navigate('/Login');
-       
-    }
+  const fetchData = () => {
+    const token = localStorage.getItem('token'); // ✅ get token from localStorage
 
-    return ( <>
-    <h1>Hi {name}</h1> <input type='button' onClick={logoutData} value='Logout' />
-    </> );
+    axios.get('http://localhost:4000/display', {
+      headers: {
+        Authorization: `Bearer ${token}`,// ✅ pass token in headers
+      }
+    })
+    .then(res => {
+      if (res.data.flag === 1) {
+        setUserData(res.data.mydata);
+      } else {
+        alert('Unauthorized or No Data Found');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Error fetching data');
+    });
+  };
+
+  const logoutData = () => {
+    localStorage.clear();
+    navigate('/Login');
+  };
+
+  return (
+    <>
+      <h1>Hi {name}</h1>
+      <input type='button' onClick={logoutData} value='Logout' />
+
+      <h3>All Users:</h3>
+      <ul>
+        {userData.map(user => (
+          <li key={user._id}>{user.name} - {user.email}</li>
+        ))}
+      </ul>
+    </>
+  );
 }
 
 export default Home;

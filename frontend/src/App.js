@@ -23,7 +23,7 @@ function App(){
           <Route path="/Home" element={<Home/>}/>
         </Routes>
       </Router>
-      <h6>AkashSir.com</h6>
+      <h6>CLOUD COMPUTING PROJECT</h6>
     </div>
   );
 }

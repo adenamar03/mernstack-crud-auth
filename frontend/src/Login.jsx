@@ -10,13 +10,14 @@ function Login() {
     const navigate = useNavigate();
 
     const submitValue = (event) => {
-        axios.post('http://127.0.0.1:4000/login',{email,password})
+        axios.post('http://127.0.0.1:5000/login',{email,password})
         .then(res=>{
             if(res.data.flag===1){
                 localStorage.setItem('is_login',true);
                 localStorage.setItem('userid',res.data.mydata._id);
                 localStorage.setItem('username',res.data.mydata.name);
-                
+                localStorage.setItem('token', res.data.token); 
+
                     navigate('/Home');
             }else{
                 alert('Login Failed');
